@@ -1,6 +1,7 @@
 package com.bignerdranch.android.photogallery.api
 
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 private const val API_KEY = "ba22281677c7bc4a0376685b74758ecb"
 
@@ -12,5 +13,5 @@ interface FlickrApi {
                 "&nojsoncallback=1" +
                 "&extras=url_s"
     )
-    suspend fun fetchPhotos(): FlickrResponse
+    suspend fun fetchPhotos(@Query("page") page: Int): FlickrResponse
 }

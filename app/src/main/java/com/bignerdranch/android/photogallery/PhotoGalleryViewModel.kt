@@ -1,31 +1,21 @@
 package com.bignerdranch.android.photogallery
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bignerdranch.android.photogallery.api.GalleryItem
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 
 private const val TAG = "PhotoGalleryViewModel"
 
 class PhotoGalleryViewModel : ViewModel() {
     private val photoRepository = PhotoRepository()
 
-    private val _galleryItems: MutableStateFlow<List<GalleryItem>> = MutableStateFlow(emptyList())
-    val galleryItems
-        get() = _galleryItems.asStateFlow()
+    val items = Pager(
+        config = PagingConfig(pageSize = 100),
+        pagingSourceFactory = { photoRepository.pagingSource() }
+    )
+        .flow
+        .cachedIn(viewModelScope)
 
-    init {
-        viewModelScope.launch {
-            try {
-                val items = photoRepository.fetchPhotos()
-                Log.d(TAG, "Items received: $items")
-                _galleryItems.value = items
-            } catch (ex: Exception) {
-                Log.e(TAG, "Failed to fetch gallery items", ex)
-            }
-        }
-    }
 }
